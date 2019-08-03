@@ -1,7 +1,7 @@
 
 function readmod(fname)
 
-	# read array of numbers directly (don't convert endianness just yet)
+	# read number(s) directly (doesn't change endianness)
 	fread = (n::Integer, T::DataType) ->
 		begin
 			data = Array{T}(undef, n)
@@ -12,8 +12,8 @@ function readmod(fname)
 	# read string
    freadc = (n::Integer) -> rstrip(String(fread(n, UInt8)))
 
-	# read ints and convert endianness
-	freadint = (n::Integer, T::DataType) ->
+	# read number(s) and change endianness
+	freadce = (n::Integer, T::DataType) ->
 		begin
 			data = Vector{T}(undef, n)
 			nb = sizeof(T)                     # number of bytes
@@ -21,7 +21,7 @@ function readmod(fname)
 				ba = Array{UInt8}(undef, nb)    # byte array
 				readbytes!(fid, ba)
 				reverse!(ba)
-				data[ii] = Int16(1)*reinterpret(Int16,ba)[1]
+				data[ii] = reinterpret(Int16,ba)[1]    # note the [1], since reinterpret returns a type that's array-like
 			end
 
 			if length(data) == 1
@@ -36,22 +36,22 @@ function readmod(fname)
    seek(fid, 0) 
 
    # read ASCII description
-   @show asciisize = freadint(1, Int16)
+   @show asciisize = freadce(1, Int16)
    @show desc      = freadc(asciisize)
 
    # read rest of header
-   @show ncoils  = freadint(1, Int16)
-   @show res     = freadint(1, Int16)
-   @show npulses = freadint(1, Int16)
+   @show ncoils  = freadce(1, Int16)
+   @show res     = freadce(1, Int16)
+   @show npulses = freadce(1, Int16)
 	l = readline(fid);
 	@show b1max = parse(Float64, l[(end-7):end]);    # b1max  = fscanf(fid, 'b1max:  %f\n');
 	l = readline(fid);
 	@show  gmax = parse(Float64, l[(end-7):end]);    # gmax   = fscanf(fid, 'gmax:   %f\n');
 
-   nparamsint16 = freadint(1, Int16)
-   paramsint16 = freadint(nparamsint16, Int16)[3:end]    # NB! Return only the user-defined ints passed to writemod.m
+   nparamsint16 = freadce(1, Int16)
+   paramsint16 = freadce(nparamsint16, Int16)[3:end]    # NB! Return only the user-defined ints passed to writemod.m
 
-   nparamsfloat = freadint(1, Int16)
+   nparamsfloat = freadce(1, Int16)
 	paramsfloat = Array{Float64}(undef, nparamsfloat)
 	for ii = 1:nparamsfloat
 		paramsfloat[ii] = parse(Float64, readline(fid));
@@ -66,14 +66,14 @@ function readmod(fname)
 	gz = zeros(res,npulses);
 	for ip = 1:npulses
 		for ic = 1:ncoils
-			rho[:,ip,ic] = freadint(res, Int16);
+			rho[:,ip,ic] = freadce(res, Int16);
 		end
 		for ic = 1:ncoils
-			theta[:,ip,ic] = freadint(res, Int16);
+			theta[:,ip,ic] = freadce(res, Int16);
 		end
-		gx[:,ip] = freadint(res, Int16);
-		gy[:,ip] = freadint(res, Int16);
-		gz[:,ip] = freadint(res, Int16);
+		gx[:,ip] = freadce(res, Int16);
+		gy[:,ip] = freadce(res, Int16);
+		gz[:,ip] = freadce(res, Int16);
 	end
 
 	# @show position(fid)
