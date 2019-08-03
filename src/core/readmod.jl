@@ -1,3 +1,5 @@
+export readmod
+
 """
 `mod = readmod(fname)`
 
