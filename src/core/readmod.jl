@@ -63,25 +63,25 @@ function readmod(fname)
 
 	fid = open(fname, "r");
 
-   seek(fid, 0) 
+	seek(fid, 0) 
 
-   # read ASCII description
-   asciisize = freadce(1, Int16)
-   desc      = freadc(asciisize)
+	# read ASCII description
+	asciisize = freadce(1, Int16)
+	desc      = freadc(asciisize)
 
-   # read rest of header
-   ncoils  = freadce(1, Int16)
-   res     = freadce(1, Int16)
-   npulses = freadce(1, Int16)
+	# read rest of header
+	ncoils  = freadce(1, Int16)
+	res     = freadce(1, Int16)
+	npulses = freadce(1, Int16)
 	l = readline(fid);
 	b1max = parse(Float32, l[(end-7):end]);    # b1max  = fscanf(fid, 'b1max:  %f\n');
 	l = readline(fid);
 	gmax = parse(Float32, l[(end-7):end]);    # gmax   = fscanf(fid, 'gmax:   %f\n');
 
-   nparamsint16 = freadce(1, Int16)
-   paramsint16 = freadce(nparamsint16, Int16)[3:end]    # NB! Return only the user-defined ints passed to writemod.m
+	nparamsint16 = freadce(1, Int16)
+	paramsint16 = freadce(nparamsint16, Int16)[3:end]    # NB! Return only the user-defined ints passed to writemod.m
 
-   nparamsfloat = freadce(1, Int16)
+	nparamsfloat = freadce(1, Int16)
 	paramsfloat = Array{Float64}(undef, nparamsfloat)
 	for ii = 1:nparamsfloat
 		paramsfloat[ii] = parse(Float64, readline(fid));
