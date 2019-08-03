@@ -24,7 +24,7 @@ function readmod(fname)
 				data[ii] = reinterpret(Int16,ba)[1]    # note the [1], since reinterpret returns a type that's array-like
 			end
 
-			if length(data) == 1
+			if n == 1
 				data = data[1]
 			end
 
@@ -36,17 +36,17 @@ function readmod(fname)
    seek(fid, 0) 
 
    # read ASCII description
-   @show asciisize = freadce(1, Int16)
-   @show desc      = freadc(asciisize)
+   asciisize = freadce(1, Int16)
+   desc      = freadc(asciisize)
 
    # read rest of header
-   @show ncoils  = freadce(1, Int16)
-   @show res     = freadce(1, Int16)
-   @show npulses = freadce(1, Int16)
+   ncoils  = freadce(1, Int16)
+   res     = freadce(1, Int16)
+   npulses = freadce(1, Int16)
 	l = readline(fid);
-	@show b1max = parse(Float64, l[(end-7):end]);    # b1max  = fscanf(fid, 'b1max:  %f\n');
+	b1max = parse(Float64, l[(end-7):end]);    # b1max  = fscanf(fid, 'b1max:  %f\n');
 	l = readline(fid);
-	@show  gmax = parse(Float64, l[(end-7):end]);    # gmax   = fscanf(fid, 'gmax:   %f\n');
+	gmax = parse(Float64, l[(end-7):end]);    # gmax   = fscanf(fid, 'gmax:   %f\n');
 
    nparamsint16 = freadce(1, Int16)
    paramsint16 = freadce(nparamsint16, Int16)[3:end]    # NB! Return only the user-defined ints passed to writemod.m
@@ -76,10 +76,9 @@ function readmod(fname)
 		gz[:,ip] = freadce(res, Int16);
 	end
 
-	# @show position(fid)
    close(fid)
 
-	# convert back to physical units
+	# convert to physical units
 	max_pg_iamp = 2.0^15-2;                   # max instruction amplitude (max value of signed short)
 	rho   = rho*b1max/max_pg_iamp;     			# Gauss
 	theta = theta*pi/max_pg_iamp;      			# radians
@@ -96,6 +95,5 @@ function readmod(fname)
 		paramsint16 = paramsint16,
 		paramsfloat = paramsfloat
       )
-k
 
 end
