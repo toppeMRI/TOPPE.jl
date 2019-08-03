@@ -1,10 +1,9 @@
 # toppe.jl
 
-
 """
-`toppe` is the Julia version of the TOPPE Matlab toolbox for MR pulse programming, https://toppemri.github.io/
+`TOPPE` is the Julia version of the TOPPE Matlab toolbox for MR pulse programming, https://toppemri.github.io/
 """
-module toppe
+module TOPPE
    # using Reexport
    # @reexport using MIRTio # make I/O routines available
 
