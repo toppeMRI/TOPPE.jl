@@ -1,7 +1,7 @@
 using Interpolations
 
 """
-`ksp = g2k(g,nint,delay)`
+`(kx,ky) = g2k(g,nint,delay)`
 
 in
 - g             [N 2] array containing Gx and Gy in Gauss/cm
@@ -28,13 +28,15 @@ function g2k(g,nint,delay)
 	dt = 4e-3                  # gradient sample duration (dwell time) (sec)
 	k = gamma*dt*cumsum(g, dims=1)     # cycles/cm
 
-	# apply rotations
-	kc = k[:,1] + 1im*k[:,2]
-	kc = kc.*exp(1im
+	# apply (in-plane) rotations
+	kc = zeros(Complex{Float64},n,nint);
+	kprot = k[:,1] + 1im*k[:,2]
+	for ii = 1:nint
+		phi = (ii-1)/nint*2pi
+		kc[:,ii] = kprot.*exp.(1im*phi)
+	end
 
-	return (
-		g = g,
-		k = k
-	)
+	return (real(kc), imag(kc))
+
 end
 
