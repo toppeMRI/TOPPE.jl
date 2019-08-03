@@ -1,14 +1,18 @@
 using Interpolations
 
 """
-`(kx,ky) = g2k(g,nint,delay)`
+`(kx,ky) = g2k(g,nint=1,delay=(0,0))`
 
 in
-- g             [N 2] array containing Gx and Gy in Gauss/cm
-- nint=1        number of leaf rotations (default=1)
-- delay=(0,0)   Tuple{<:Real,<:Real} containing shift in gx and gy, in units of samples
+- g            [N 2] array containing Gx and Gy in Gauss/cm
+- nint         number of leaf rotations
+- delay        Tuple{<:Real,<:Real} containing shift in gx and gy, in units of samples
 """
-function g2k(g,nint,delay)
+function g2k(
+	g::Array{<:Real,2},
+	nint::Integer=1,
+	delay::Tuple{<:Real,<:Real}=(0,0)
+	)
 
 	# apply delay
 	npad = 100      # maximum shift (samples)
@@ -37,6 +41,17 @@ function g2k(g,nint,delay)
 	end
 
 	return (real(kc), imag(kc))
-
 end
 
+"""
+`(kx,ky) = g2k(gx::Vector{<:Real}, gy::Vector{<:Real}, nint=1, delay=(0,0))`
+"""
+function g2k(
+	gx::Vector{<:Real},
+	gy::Vector{<:Real},
+	nint::Integer=1,
+	delay::Tuple{<:Real,<:Real}=(0,0)
+	)
+
+	return g2k([gx gy], nint, delay)
+end
