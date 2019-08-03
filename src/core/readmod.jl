@@ -40,7 +40,7 @@ function readmod(fname)
 		end
 
 	# read string
-   freadc = (n::Integer) -> rstrip(String(fread(n, UInt8)))
+	freadc = (n::Integer) -> rstrip(String(fread(n, UInt8)))
 
 	# read number(s) and change endianness
 	freadce = (n::Integer, T::DataType) ->
@@ -58,8 +58,8 @@ function readmod(fname)
 				data = data[1]
 			end
 
-         return data
-      end
+			return data
+		end
 
 	fid = open(fname, "r");
 
@@ -106,7 +106,7 @@ function readmod(fname)
 		gz[:,ip] = freadce(res, Int16);
 	end
 
-   close(fid)
+	close(fid)
 
 	# convert to physical units
 	max_pg_iamp = Float32(2^15-2);                   # max instruction amplitude (max value of signed short)
@@ -117,13 +117,13 @@ function readmod(fname)
 	gz = gz*gmax/max_pg_iamp;                 # Gauss/cm
 
 	return ( # NamedTuple
-      desc = desc,
+		desc = desc,
 		rf = rho.*exp.(1im*theta),
 		gx = gx,
 		gy = gy,
 		gz = gz,
 		paramsint16 = paramsint16,
 		paramsfloat = paramsfloat
-      )
+		)
 
 end
