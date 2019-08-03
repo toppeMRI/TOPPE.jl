@@ -20,10 +20,7 @@ function g2k(
 	delay::Tuple{<:Real,<:Real}=(0,0)
 	)
 
-	phi = Vector{Float64}(undef, nint)
-	for ii = 0:nint-1
-		phi[ii+1] = ii/nint*2pi
-	end
+	phi = collect(0:2pi/nint:2pi-2pi/nint)
 	
 	return g2k(g, phi, delay)
 end
