@@ -20,6 +20,25 @@ function g2k(
 	delay::Tuple{<:Real,<:Real}=(0,0)
 	)
 
+	phi = Vector{Float64}(undef, nint)
+	for ii = 0:nint-1
+		phi[ii+1] = ii/nint*2pi
+	end
+	
+	return g2k(g, phi, delay)
+end
+
+"""
+`(kx,ky) = g2k(g::Array{<:Real,2}, phi::Vector{<:Real}, delay::Tuple{<:Real,<:Real}=(0,0))`
+
+Apply one or more supplied rotation angles phi
+"""
+function g2k(
+	g::Array{<:Real,2},
+	phi::Vector{<:Real},
+	delay::Tuple{<:Real,<:Real}=(0,0)
+	)
+
 	# apply delay
 	npad = 100      # maximum shift (samples)
 	if any(i -> abs(i) > npad-1, delay)
@@ -39,14 +58,13 @@ function g2k(
 	k = gamma*dt*cumsum(g, dims=1)     # cycles/cm
 
 	# apply (in-plane) rotations
-	kc = Array{Complex{Float64}}(undef,n,nint);
+	kc = Array{Complex{Float64}}(undef,n,length(phi));
 	kprot = k[:,1] + 1im*k[:,2]
-	for ii = 1:nint
-		phi = (ii-1)/nint*2pi
-		kc[:,ii] = kprot.*exp.(1im*phi)
+	for ii = 1:length(phi)
+		kc[:,ii] = kprot.*exp.(1im*phi[ii])
 	end
 
-	if nint==1
+	if length(phi)==1
 		kc = kc[:,1]     # return vector
 	end
 
@@ -65,3 +83,17 @@ function g2k(
 
 	return g2k([gx gy], nint, delay)
 end
+
+"""
+`(kx,ky) = g2k(gx::Vector{<:Real}, gy::Vector{<:Real}, phi::Vector{<:Real}, delay=(0,0))`
+"""
+function g2k(
+	gx::Vector{<:Real},
+	gy::Vector{<:Real},
+	phi::Vector{<:Real},
+	delay::Tuple{<:Real,<:Real}=(0,0)
+	)
+
+	return g2k([gx gy], phi, delay)
+end
+
