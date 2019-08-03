@@ -109,12 +109,23 @@ function readmod(fname)
 	close(fid)
 
 	# convert to physical units
-	max_pg_iamp = Float32(2^15-2);                   # max instruction amplitude (max value of signed short)
-	rho   = rho*b1max/max_pg_iamp;     			# Gauss
-	theta = theta*pi/max_pg_iamp;      			# radians
-	gx = gx*gmax/max_pg_iamp;                 # Gauss/cm
-	gy = gy*gmax/max_pg_iamp;                 # Gauss/cm
-	gz = gz*gmax/max_pg_iamp;                 # Gauss/cm
+	max_pg_iamp = Float32(2^15-2)                   # max instruction amplitude (max value of signed short)
+	rho   = rho*b1max/max_pg_iamp     			# Gauss
+	theta = theta*pi/max_pg_iamp      			# radians
+	rf = rho.*exp.(1im*theta)
+	gx = gx*gmax/max_pg_iamp                 # Gauss/cm
+	gy = gy*gmax/max_pg_iamp                 # Gauss/cm
+	gz = gz*gmax/max_pg_iamp                 # Gauss/cm
+
+	# return vector if 2nd (and for rf, 3rd) dimension is 1
+	if npulses==1
+		gx = gx[:,1]
+		gy = gy[:,1]
+		gz = gz[:,1]
+		if ncoils==1
+			rf = rf[:,1,1]
+		end
+	end
 
 	return ( # NamedTuple
 		desc = desc,
