@@ -1,7 +1,9 @@
+export g2k
+
 using Interpolations
 
 """
-`(kx,ky) = g2k(g, nint=1, delay=(0,0))`
+`(kx,ky) = g2k(g::Array{<:Real,2}, nint::Integer=1, delay::Tuple{<:Real,<:Real}=(0,0))`
 
 in
 - g            [N 2] array of Real numbers containing Gx and Gy in Gauss/cm
