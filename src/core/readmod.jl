@@ -1,4 +1,32 @@
+"""
+`mod = readmod(fname)`
 
+Read TOPPE .mod file
+
+in
+
+-- `fname::String`   .mod file name
+
+out
+
+-- `mod::NamedTuple` with header and waveforms, accessed by mod.key
+-   `mod.rf`     [n npulses ncoils] Array{Complex{Float32},3}
+-   `mod.gx`     [n npulses] Array{Float32,2}
+-   `mod.gy`     [n npulses] Array{Float32,2}
+-   `mod.gz`     [n npulses] Array{Float32,2}
+-   `mod.paramsint16`  30-element Array{Int16,1}
+-   `mod.paramsfloat`  32-element Array{Float64,1}
+
+example
+
+   include("readmod.jl")
+
+   mod = readmod("readout.mod").
+
+   using Plots
+
+   plot([mod.gx mod.gy mod.gz])
+"""
 function readmod(fname)
 
 	# read number(s) directly (doesn't change endianness)
@@ -44,9 +72,9 @@ function readmod(fname)
    res     = freadce(1, Int16)
    npulses = freadce(1, Int16)
 	l = readline(fid);
-	b1max = parse(Float64, l[(end-7):end]);    # b1max  = fscanf(fid, 'b1max:  %f\n');
+	b1max = parse(Float32, l[(end-7):end]);    # b1max  = fscanf(fid, 'b1max:  %f\n');
 	l = readline(fid);
-	gmax = parse(Float64, l[(end-7):end]);    # gmax   = fscanf(fid, 'gmax:   %f\n');
+	gmax = parse(Float32, l[(end-7):end]);    # gmax   = fscanf(fid, 'gmax:   %f\n');
 
    nparamsint16 = freadce(1, Int16)
    paramsint16 = freadce(nparamsint16, Int16)[3:end]    # NB! Return only the user-defined ints passed to writemod.m
@@ -59,11 +87,11 @@ function readmod(fname)
 
 	# read waveforms
 	# @show position(fid)
-	rho   = zeros(res,npulses,ncoils);
-	theta = zeros(res,npulses,ncoils);
-	gx = zeros(res,npulses);
-	gy = zeros(res,npulses);
-	gz = zeros(res,npulses);
+	rho   = zeros(Float32,res,npulses,ncoils);
+	theta = zeros(Float32,res,npulses,ncoils);
+	gx = zeros(Float32,res,npulses);
+	gy = zeros(Float32,res,npulses);
+	gz = zeros(Float32,res,npulses);
 	for ip = 1:npulses
 		for ic = 1:ncoils
 			rho[:,ip,ic] = freadce(res, Int16);
@@ -79,7 +107,7 @@ function readmod(fname)
    close(fid)
 
 	# convert to physical units
-	max_pg_iamp = 2.0^15-2;                   # max instruction amplitude (max value of signed short)
+	max_pg_iamp = Float32(2^15-2);                   # max instruction amplitude (max value of signed short)
 	rho   = rho*b1max/max_pg_iamp;     			# Gauss
 	theta = theta*pi/max_pg_iamp;      			# radians
 	gx = gx*gmax/max_pg_iamp;                 # Gauss/cm
