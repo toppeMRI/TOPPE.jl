@@ -17,7 +17,7 @@ nt.B == D["B"]     # true
 """ 
 function dict2namedtuple(D)
 
-	# key keys and convert to Symbol array
+	# get keys and convert to Symbol array
 	k = collect(keys(D))
 
 	sym = Array{Symbol}(undef, length(k))
