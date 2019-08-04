@@ -12,12 +12,12 @@ in
 out
 
 -- `mod::NamedTuple` with header and waveforms, accessed by mod.key
--   `mod.rf`     RF waveform (Gauss)       [n npulses ncoils] Array{Complex{Float32}}
--   `mod.gx`     Gx waveform (Gauss/cm)    [n npulses] Array{Float32,1 or 2} 
--   `mod.gy`     Gy waveform (Gauss/cm)    [n npulses] Array{Float32,1 or 2}
--   `mod.gz`     Gz waveform (Gauss/cm)    [n npulses] Array{Float32,1 or 2} 
--   `mod.paramsint16`  30-element Array{Int16,1}
--   `mod.paramsfloat`  32-element Array{Float64,1}
+-   `mod.rf`     RF waveform (Gauss)       [n npulses ncoils]
+-   `mod.gx`     Gx waveform (Gauss/cm)    [n npulses]
+-   `mod.gy`     Gy waveform (Gauss/cm)    [n npulses]
+-   `mod.gz`     Gz waveform (Gauss/cm)    [n npulses]
+-   `mod.paramsint16`  30-element Vector{Int16}
+-   `mod.paramsfloat`  32-element Vector{Float64}
 
 example
 
