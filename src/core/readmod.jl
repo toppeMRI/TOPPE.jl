@@ -12,10 +12,10 @@ in
 out
 
 -- `mod::NamedTuple` with header and waveforms, accessed by mod.key
--   `mod.rf`     RF waveform (Gauss)       [n npulses ncoils] Array{Complex{Float32},3}
--   `mod.gx`     Gx waveform (Gauss/cm)    [n npulses] Array{Float32,2}
--   `mod.gy`     Gy waveform (Gauss/cm)    [n npulses] Array{Float32,2}
--   `mod.gz`     Gz waveform (Gauss/cm)    [n npulses] Array{Float32,2}
+-   `mod.rf`     RF waveform (Gauss)       [n npulses ncoils] Array{Complex{Float32}}
+-   `mod.gx`     Gx waveform (Gauss/cm)    [n npulses] Array{Float32,1 or 2} 
+-   `mod.gy`     Gy waveform (Gauss/cm)    [n npulses] Array{Float32,1 or 2}
+-   `mod.gz`     Gz waveform (Gauss/cm)    [n npulses] Array{Float32,1 or 2} 
 -   `mod.paramsint16`  30-element Array{Int16,1}
 -   `mod.paramsfloat`  32-element Array{Float64,1}
 
@@ -109,13 +109,13 @@ function readmod(fname)
 	close(fid)
 
 	# convert to physical units
-	max_pg_iamp = Float32(2^15-2)                   # max instruction amplitude (max value of signed short)
-	rho   = rho*b1max/max_pg_iamp     			# Gauss
-	theta = theta*pi/max_pg_iamp      			# radians
+	max_pg_iamp = Float32(2^15-2)          # max instruction amplitude (max value of signed short)
+	rho   = rho*b1max/max_pg_iamp          # Gauss
+	theta = theta*pi/max_pg_iamp           # radians
 	rf = rho.*exp.(1im*theta)
-	gx = gx*gmax/max_pg_iamp                 # Gauss/cm
-	gy = gy*gmax/max_pg_iamp                 # Gauss/cm
-	gz = gz*gmax/max_pg_iamp                 # Gauss/cm
+	gx = gx*gmax/max_pg_iamp               # Gauss/cm
+	gy = gy*gmax/max_pg_iamp               # Gauss/cm
+	gz = gz*gmax/max_pg_iamp               # Gauss/cm
 
 	# return vector if 2nd (and for rf, 3rd) dimension is 1
 	if npulses==1
