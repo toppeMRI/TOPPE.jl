@@ -50,8 +50,8 @@ function g2k(
 	end
 
 	# calculate kspace
-	gamma = 4.2576;            # kHz/Gauss
-	dt = 4e-3                  # gradient sample duration (dwell time) (sec)
+	gamma = 4.2576             # kHz/Gauss
+	dt = 4e-3                  # gradient sample duration (dwell time) (millisec)
 	k = gamma*dt*cumsum(g, dims=1)     # cycles/cm
 
 	# apply (in-plane) rotations
