@@ -6,13 +6,6 @@ using FFTW
 `(ims, imsos) = recon3dft(dat::Array{Complex{<:Real},4})
 
 WIP: need to make interface like toppe.utils.recon3dft
-
-"""
-
-
-"""
-`(ims, imsos) = recon3dft(dat::Array{Complex{<:Real},4})
-3D ift
 """
 function recon3dft(
 	dat::Array{Complex{Float32},4}
