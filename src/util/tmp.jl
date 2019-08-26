@@ -20,24 +20,26 @@ function recon3dft(pfile::String;
 	mod = readmod(readoutfile);
 	nramp = 0; 
 	nbeg = mod.paramsint16[1] + nramp;
-	nx = mod.paramsint16[2];                       # number of acquired data samples per TR
+	ndat = mod.paramsint16[2];                       # number of acquired data samples per TR
+	oprbw = mod.paramsfloat[20];
 	decimation = round(125.0/mod.paramsfloat[20]);
-	dat = dat[nbeg:(nbeg+nx-1),:,:,:,echo];           # [nx*125/oprbw ny nz ncoils]
+	dat = dat[nbeg:(nbeg+ndat-1),:,:,:,echo];           # [nx*125/oprbw ny nz ncoils]
 
-#	imstmp = ift3(d(:,:,:,coil));
-#   imstmp = imstmp(end/2+((-nx/decimation/2):(nx/decimation/2-1))+1,:,:);               % [nx ny nz]
+	# convert to float and recon
+	dat = convert(Array{Complex{Float32},4}, dat);	
+	(imsFullfov, ) = recon3dft(dat);      # FOV in readout is still 125/oprbw too large here
 
+	# image matrix size
 	(ndat, ny, nz, ncoils) = size(dat);
+	nx = Integer(round(ndat*oprbw/125));
 
+	# crop FOV in readout direction
+	ims = Array{Complex{<:Real}}(undef, nx, ny, nz, ncoils);
+   ims = imsFullfov[range(Int(ndat/2-nx/2), length=nx), :, :, :];
 
-	# recon
-	(ims, tmp) = recon3dft(dat);	
+	imsos = sum(ims.*conj(ims), dims=4);
 
-	return (dat, ims)
-
-#	@show size(dat)
-
-#	return (ims, imsos)
+	return (ims, imsos)
 end
 
 """
@@ -46,15 +48,14 @@ end
 WIP: need to make interface like toppe.utils.recon3dft
 """
 function recon3dft(
-	dat::Array{Complex{Int16},4}
+	dat::Array{Complex{<:Real},4}
 	) 
 
 	(nx,ny,nz,ncoil) = size(dat);
 
 	ims = similar(dat);
 	for ic = 1:ncoil
-		ims[:,:,:,ic] = ifft(fftshift(dat[:,:,:,ic]));
-		#ims[:,:,:,ic] = fftshift(dat[:,:,:,ic]);
+		ims[:,:,:,ic] = fftshift(ifft(fftshift(dat[:,:,:,ic])));
 	end
 
 	imsos = sum(ims.*conj(ims), dims=4);
@@ -69,10 +70,6 @@ end
 function recon3dft(s::Symbol)
 
 	s != :test && throw("call syntax: recon_sense(:test)")
-
-	# ncoil = 8;
-	# N = (64,64,24);
-	# dat = Array{Complex{Float32}}(undef,N...,ncoil);
 
 	datdir = "/export/data/jfnielse/stack-of-spirals-presto-bold-fmri/fbirn,14Aug2019/";
 	pfile = string(datdir, "P,fbirn,14Aug2019,b0.7");
